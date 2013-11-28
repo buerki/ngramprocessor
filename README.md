@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ![NGP](NGP.png)
 
 N-Gram Processor (NGP)
@@ -80,3 +81,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+=======
+ngramprocessor
+==============
+>>>>>>> f9c6a96955fc33ff794467c5701630ba0db3c664
