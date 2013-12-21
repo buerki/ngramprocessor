@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 
 #####################################################################
-# Unify.pl (part of the N-Gram Processor)
+# unify.pl (part of the N-Gram Processor)
 # incorporating code from NSP 1.10's huge-combine.pl/Combiner.pm
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 #####
 our $copyright = "Copyright 2013, Andreas Buerki
 Copyright 2006, Bjoern Wilmsmann (v. 1.10 NSP)
@@ -30,6 +30,7 @@ Copyright 2004, Amruta Parundare & Ted Pedersen (v. 1.09 NSP)\n";
 #
 # CHANGELOG
 # date		 v.		change
+# 2013-12-21 0.05	added explicit encoding to all filehandles and -e option
 # 2013-11-14 0.04	fixed and corrected pod documentation
 # 2013-11-05 0.03	made separator flexible, so various separators can
 #					be used; adjusted for use with Ngramprocessor.pm instead of
@@ -47,16 +48,17 @@ Copyright 2004, Amruta Parundare & Ted Pedersen (v. 1.09 NSP)\n";
 #-----------------------------------------------------------------------------
 
 
-## include external modules
+### require Perl 5.12 minimally for good unicode support
+use v5.12;
 
-# use strict to enforce declaration of variables
+
+### include external modules
 use strict;
 use warnings;
-
-# use locale for localised tokenization
 use locale;
+use Encoding;
 
-# set encoding to utf-8
+# set encoding of this code to utf-8
 use utf8;
 
 # use Getopt::Long to parse options (bundling, i.e. -ex for -e -x is allowed)
@@ -100,9 +102,10 @@ our $combIndex; # variable needed for display of 1.09-style freq_combos
 # define some variables
 our $name = basename($0); # the name of this programme
 our $original_dir = cwd; # store current working directory here
+our $opt_encoding = 'utf8'; # utf8 or iso-8859-1 for reading and writing files
 
 # set STDOUT to display in unicode
-binmode(STDOUT, ":utf8");
+binmode(STDOUT, ":$opt_encoding");
 
 #################################define functions##############################
 
@@ -123,6 +126,13 @@ sub help {
     print "  -D --display_freq_combo    Displays the file combinations used.\n\n";
     print "  -c --calculate_all_freq_combo N Displays all possible freq combinations for N\n\n";
     print "  -d --doc_count        Adds a document count to each n-gram.\n\n";
+    print " -e --encoding ENC   Handles input and output files with the given\n";
+    print "                     character encoding. Default is utf8, but\n";
+    print "                     this can be chanced by specifying  an encoding.\n";
+    print "                     Non-utf8 is not generally recommended and\n";
+    print "                     here only provided for compatibility with\n";
+    print "                     legacy data. It is better to convert the\n";
+    print "                     data to utf8.\n\n";
     print "  -p --separator SEP    Specifies a custom SEP\n'n";
     print "  -s --set_freq_combo FILE 	Uses the frequency combinations in FILE
                         when counting frequencies.\n\n";
@@ -173,7 +183,7 @@ sub combine {
 		$lineNumber = 0;
 
 		# open input file
-		open(IN, $source)
+		open(IN, "<:encoding($opt_encoding)", $source)
 			|| die("Can't open n-gram file <$source>.\n");
 			  		
 		# iterate over lines in the INFILE
@@ -233,7 +243,7 @@ sub combine {
 	chdir($original_dir)	or die "Can't change back to $original_dir: $!";
 
 	# try to open destination file
-	open(DST, ">$out_file")
+	open(DST, ">:encoding($opt_encoding)", "$out_file" )
 		|| die("Couldn't open output file: $out_file");
 
 	# print out the total ngrams
@@ -244,7 +254,7 @@ sub combine {
 
 	# print merged n-gram counts to destination file
 	#print "calling printTokens($out_file, $nsize, $separator, \$opt_doc_count, $freq_combo)\n";
-	printTokens($out_file, $nsize, $separator, $opt_doc_count, $freq_combo);	
+	printTokens($out_file, $nsize, $separator, $opt_doc_count, $freq_combo, $opt_encoding);	
 	
 }
 
@@ -264,7 +274,7 @@ if ( $#ARGV == -1 ) {
 
 ### analyse options
 
-GetOptions qw( help|h doc_count|d version|V verbose|v separator|p=s set_freq_combo|s=s display_freq_combo|D calculate_all_freq_combo|c=i quiet|q );
+GetOptions qw( help|h doc_count|d version|V verbose|v separator|p=s set_freq_combo|s=s display_freq_combo|D encoding|e=s calculate_all_freq_combo|c=i quiet|q );
 
 # if help has been requested, show help, then exit
 if (defined $opt_help) {
@@ -363,7 +373,7 @@ else {
 # get separator and n-gram size from line 2 of first input file
 # open first input file and put second line (or last line if only 1)
 # in variable $line
-open(INFILE, "<$input_files[0]") || die "Can't open $input_files[0] for reading: $!\n";
+open(INFILE, "<:encoding($opt_encoding)", $input_files[0]) || die "Can't open $input_files[0] for reading: $!\n";
 while (<INFILE>) {
 	$line=$_;
 	last if $. == 2;
@@ -437,6 +447,10 @@ Adds a count of how many documents (input files) each n-gram appears in. This fi
 =item * -D --display_freq_combo
 
 Shows the current frequency combinations setting.
+
+=item * -e --encoding ENC  
+
+Handles input and output files with the character encoding given as ENC. The default is utf8; if necessary a different encoding can be forced using this option. Non-utf8 is not generally recommended and the option is here only provided for compatibility with legacy data sets. It is better to convert the data to utf8 as non-utf8 encodings have not been widely used in testing.
 
 =item * -h --help
 

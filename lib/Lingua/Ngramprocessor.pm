@@ -1,7 +1,7 @@
 package Lingua::Ngramprocessor;
 #####################################################################
 # Ngramprocessor.pm (part of the N-Gram Processor)
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 ####
 # Copyright 2013, Andreas Buerki
 # Copyright 2006, Bjoern Wilmsmann
@@ -22,6 +22,8 @@ our $VERSION = '0.03';
 #####################################################################
 # CHANGELOG
 # date		 v.		change
+# 2013-12-21 0.04	fixed an encoding issue by adding utf8 explicity where
+#					the programme writes to $out_file
 # 2013-11-07 0.03	added necessary functions formerly contain in Tokenizer.pm
 #					and some functions for displaying and calculating frequency
 #					combinations.
@@ -29,13 +31,20 @@ our $VERSION = '0.03';
 #					what used to be just a dummy module.
 ####
 
-## include external libraries
+### require Perl 5.12 minimally for good unicode support
+use v5.12;
 
+## include external modules
 use strict;
 use warnings;
 #use diagnostics;
 use Exporter;
+use locale;
+use Encoding;
+
+# set encoding of this code to utf-8
 use utf8;
+
 
 ###############################declaring variables#############################
 
@@ -49,6 +58,10 @@ our $merge; # this is a ref to the hash which is to hold the merged list
 our $frequencies; # ref to hash holding frequencies
 our $ngrams;
 our %ngrams;
+our $opt_encoding = 'utf8'; # utf8 or iso-8859-1 for reading and writing files
+
+# set STDOUT to display in unicode
+binmode(STDOUT, ":$opt_encoding");
 
 # function to create all frequency combinations that can be computed
 # and output (from count.pl 0.58 of NSP 1.23)
@@ -296,14 +309,15 @@ sub merge {
 
 # function for printing tokens
 sub printTokens {
-	my ($out_file, $nsize, $separator, $filecount, $freq_combo) = @_;
+	my ($out_file, $nsize, $separator, $filecount, $freq_combo, $opt_encoding) = @_;
 	my $i;
 	my $j;
 	my @ngram; # this is an array to hold the words of the current n-gram
 	my $ngramBuffer; # Buffer for use only in this subroutine
 
 	# try to open out_file file
-	open(DST, ">>$out_file") || die("Couldn't open output file: $out_file");
+	open( DST, ">>:encoding($opt_encoding)", "$out_file" ) || die("Couldn't open output file: $out_file");
+	
 
 	# if n-gram size > 1
 	if ($nsize > 1) {

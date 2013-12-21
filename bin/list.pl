@@ -55,11 +55,16 @@ our $VERSION = '0.05';
 #                              Start of program
 #-----------------------------------------------------------------------------
 
+### require Perl 5.12 minimally for good unicode support
+use v5.12;
+
 ### include external modules
 use strict;
 use warnings;
 use locale;
 use Encoding;
+
+# set encoding of this code to utf-8
 use utf8;
 
 # use Getopt::Long to parse options (bundling, i.e. -ex for -e -x is allowed)
@@ -71,7 +76,7 @@ use Lingua::Ngramprocessor;
 ###############################declaring variables#############################
 
 # set very important variables:
-our $tokendef="-\'&§%\/\+°ß";
+our $tokendef="-\'&§%\/\+°ß"; # this is in addition to alphanumeric characters (\w+)
 
 # declare variables
 our $opt_verbose;
@@ -138,7 +143,15 @@ sub help
 
     print " -e --encoding ENC   Handles input and output files with the given\n";
     print "                     character encoding. Default is utf8, but\n";
-    print "                     this can be chanced by specifying iso-8859-1\n\n";
+    print "                     if necessary a different encoding can be\n";
+    print "                     forced using this option. A suitable token\n";
+    print "                     definition must also be supplied as the\n";
+    print "                     standard token definition is in utf8 (use -t)\n";
+    print "                     Non-utf8 is not generally recommended and\n";
+    print "                     here only provided for compatibility with\n";
+    print "                     legacy data. It is better to convert the\n";
+    print "                     data to utf8 as non-utf8 encodings have not\n";
+    print "                     been widely used in testing.\n\n";
 
     print " -f --frequency N    Does not display n-grams that occur less\n";
     print "                     than N times.\n\n";
@@ -476,7 +489,7 @@ if ( $#ARGV == -1 )
 }
 
 ### analyse options
-GetOptions qw( verbose|v version|V help|h frequency|f=i window|w=i stop|o=s newline|l encoding=s token|t=s nsize|n=i set_freq_combo|s=s display_freq_combo|d all_freq_combos|a separator|p=s );
+GetOptions qw( verbose|v version|V help|h frequency|f=i window|w=i stop|o=s newline|l encoding|e=s token|t=s nsize|n=i set_freq_combo|s=s display_freq_combo|d all_freq_combos|a separator|p=s );
 
 # if help has been requested, print out help
 if ( defined $opt_help ) { 
@@ -894,7 +907,7 @@ Prints out the frequency combinations used. If frequency combinations have been 
 
 =item * -e --encoding ENC  
 
-Handles input and output files with the given character encoding. Default: UTF-8.
+Handles input and output files with the character encoding given as ENC. The default is utf8; if necessary a different encoding can be forced using this option. A suitable token definition must also be supplied as the standard token definition is in utf8 (use -t option). Non-utf8 is not generally recommended and the option is here only provided for compatibility with legacy data sets. It is better to convert the data to utf8 as non-utf8 encodings have not been widely used in testing.
 
 =item * -f --frequency N    
 

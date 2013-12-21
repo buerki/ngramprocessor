@@ -1,3 +1,19 @@
+release notes v. 0.3.1
+**********************
+
+2013-12-21
+list.pl, unify.pl, Ngramprocessor.pm: 
+	- updated to ensure encoding on all filehandles
+	- '-e' option added to unify.pl to allow legacy encodings
+	- opt_encoding is passed to ngramprocessor.pm where necessary 
+	  so that all encoding should now be handled in utf8 unless 
+	  specified differently by the -e option to either list.pl or
+	  unify.pl
+
+manual_0.3.pdf: 
+	- updated to reflect changes in 0.3.1 
+
+
 release notes v. 0.3
 ********************
 
