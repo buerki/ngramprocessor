@@ -2,7 +2,7 @@
 
 ##############################################################################
 # multi-nList.sh (c) A Buerki 2013
-version="0.9.1"
+version="0.9.2"
 copyright="Copyright 2013 Andreas Buerki"
 #
 # This program is free software: you can redistribute it and/or modify
@@ -35,6 +35,7 @@ copyright="Copyright 2013 Andreas Buerki"
 # CHANGELOG
 # 
 # DATE			VERSION			CHANGE
+# 2013-12-26	0.9.2			adjusted progress reporting to use (( ))
 ##############################################################################
 
 ### defining important variables
@@ -296,10 +297,10 @@ if [ "$perdoc" == "per_doc" ] ; then
 		fi
 		((progress +=1))
 		if [ "$verbose" == "true" ]; then
-			if [ "$(expr $progress '*' 100 '/' $total)" -lt "10" ]; then
-				echo -en "\b\b\b $(expr $progress '*' 100 '/' $total)%"
+			if [ "$(($progress * 100 / $total))" -lt "10" ]; then
+				echo -en "\b\b\b $(($progress * 100 / $total))%"
 			else
-				echo -en "\b\b\b\b $(expr $progress '*' 100 '/' $total)%"
+				echo -en "\b\b\b\b $(($progress * 100 / $total))%"
 			fi
 		fi
 		done
@@ -338,7 +339,7 @@ if [ "$perdoc" == "per_doc" ] ; then
 			rm ../high-per-doc-freq_lists/$output_filename
 		fi
 
-		cd $orig_dir
+		cd "$orig_dir"
 	fi
 
 else
@@ -357,7 +358,7 @@ else
 		mv $outdir/$outfolder/$nsize.lst.tmp $outdir/$outfolder/$nsize.lst
 	fi
 
-	cd $orig_dir
+	cd "$orig_dir"
 
 	if [ "$verbose" == "true" ]; then
 		echo "$nsize.lst list created in $outdir/$outfolder"

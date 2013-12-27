@@ -10,7 +10,7 @@ make test
 make install
 
 The last command requires administrative privileges, so it might need to be
-be run as 'sudo make install', for example on Mac OS. This installs the files
+be run as 'sudo make install', for example on OS X. This installs the files
 in the standard locations. For more information see the PDF-manual.
 
-The N-Gram Processor requires Perl version 5.8.5 or later and the shell scripts included require the bash shell.
+The N-Gram Processor requires Perl version 5.12 or later and the shell scripts included require the bash shell.

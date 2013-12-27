@@ -8,8 +8,8 @@ test/files/text2.txt
 test/goldstandard_lists/2.comp.s/2.lst
 test/goldstandard_lists/2.comp.stop_en/2.lst
 test/goldstandard_lists/3.per_doc.lst
-test/goldstandard_lists/indiv_lists_3.per_doc/text1.txt.lst
-test/goldstandard_lists/indiv_lists_3.per_doc/text2.txt.lst
+test/goldstandard_lists/3.per_doc/text1.txt.lst
+test/goldstandard_lists/3.per_doc/text2.txt.lst
 test/goldstandard_lists/out1.lst
 test/goldstandard_lists/out2.lst
 test/goldstandard_lists/out3.lst
@@ -27,7 +27,7 @@ CHANGES
 gpl-3.0.txt
 INSTALL
 lib/Lingua/Ngramprocessor.pm
-manual_0.3.pdf
+manual_0.4.pdf
 Makefile.PL
 MANIFEST
 README.txt

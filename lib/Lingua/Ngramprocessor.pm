@@ -24,6 +24,9 @@ our $VERSION = '0.04';
 # date		 v.		change
 # 2013-12-21 0.04	fixed an encoding issue by adding utf8 explicity where
 #					the programme writes to $out_file
+#					calling programme now passes encoding option if other than
+#					utf-8 to function
+#					replaced use encoding; with use Encode;
 # 2013-11-07 0.03	added necessary functions formerly contain in Tokenizer.pm
 #					and some functions for displaying and calculating frequency
 #					combinations.
@@ -40,7 +43,7 @@ use warnings;
 #use diagnostics;
 use Exporter;
 use locale;
-use Encoding;
+use Encode qw(decode encode);
 
 # set encoding of this code to utf-8
 use utf8;

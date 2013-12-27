@@ -26,11 +26,14 @@ Copyright 2004, Amruta Parundare & Ted Pedersen (v. 1.09 NSP)\n";
 # -c --calculate_all_freq_combo
 # calculates and displays only all possible frequency combinations which can be # used to calculate various statistics. The output of this option can be used to # produce an input file for the -s option (above).
 #
-#
+# -q --quiet
+# used when programme is called from split-unify.sh to silence some warnings
+# that are not applicable 
 #
 # CHANGELOG
 # date		 v.		change
 # 2013-12-21 0.05	added explicit encoding to all filehandles and -e option
+#					replaced use encoding; with use Encode;
 # 2013-11-14 0.04	fixed and corrected pod documentation
 # 2013-11-05 0.03	made separator flexible, so various separators can
 #					be used; adjusted for use with Ngramprocessor.pm instead of
@@ -56,7 +59,7 @@ use v5.12;
 use strict;
 use warnings;
 use locale;
-use Encoding;
+use Encode qw(decode encode);
 
 # set encoding of this code to utf-8
 use utf8;

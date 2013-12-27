@@ -1,7 +1,7 @@
 N-Gram Processor (NGP)
 ======================
 
-* see the indluded manual.pdf for detailed information, including a tutorial *
+* see the included manual_0.4.pdf for detailed information, including a tutorial *
 
 DESCRIPTION
 ***********
@@ -37,7 +37,7 @@ The last command requires administrative privileges, so it might need to be
 be run as 'sudo make install', for example on OS X. This installs the files
 in the standard locations. For more details, see the PDF-manual.
 
-The N-Gram Processor requires Perl version 5.8.5 or later and the shell scripts included require the bash shell.
+The N-Gram Processor requires Perl version 5.12 or later and the shell scripts included require the bash shell.
 
 AUTHOR
 ******

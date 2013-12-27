@@ -3,7 +3,7 @@
 ##############################################################################
 # list.pl
 # based on NSP's count.pl
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 ####
 # Copyright 2013, Andreas Buerki
 # Copyright 2000-2003, Ted Pedersen and Amruta Purandare
@@ -24,6 +24,7 @@ our $VERSION = '0.05';
 # CHANGELOG
 # 
 # DATE			VERSION			CHANGE
+# 2013-12-21	0.06			changed use encoding; to use Encode;
 # 2013-11-13	0.05			made calculation of plain n-gram frequencies the
 #								default behaviour, -a to calculate all freq comb
 #								added binmode(STDOUT, ":$opt_encoding") to have 
@@ -62,7 +63,7 @@ use v5.12;
 use strict;
 use warnings;
 use locale;
-use Encoding;
+use Encode qw(decode encode);
 
 # set encoding of this code to utf-8
 use utf8;

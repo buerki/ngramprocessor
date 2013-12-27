@@ -9,7 +9,7 @@ my @shellscripts_to_install = qw(multi-list.sh split-unify.sh);
 
 WriteMakefile(
     NAME              => 'Lingua::Ngramprocessor',
-    VERSION		      => '0.3.1',
+    VERSION		      => '0.4',
     PREREQ_PM         => {},
     EXE_FILES         => [
                            map ("bin/$_", @perlscripts_to_install),

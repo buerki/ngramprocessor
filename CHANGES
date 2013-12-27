@@ -1,21 +1,39 @@
+release notes v. 0.4
+********************
+2013-12-27
+
+NGP now requires Perl 5.12 minimally.
+
+split-unify.sh:
+- added -m option for minimum memory consumption algorithm
+- efficiency improvements in progress reporting when in verbose mode
+
+manual_0.4.pdf:
+- updated for version 0.4
+
+test:
+- updated goldstandard_lists for version 0.4
+
+
+
 release notes v. 0.3.1
 **********************
-
 2013-12-21
+
 list.pl, unify.pl, Ngramprocessor.pm: 
-	- updated to ensure encoding on all filehandles
-	- '-e' option added to unify.pl to allow legacy encodings
-	- opt_encoding is passed to ngramprocessor.pm where necessary 
-	  so that all encoding should now be handled in utf8 unless 
-	  specified differently by the -e option to either list.pl or
-	  unify.pl
+        - updated to ensure encoding on all filehandles
+        - '-e' option added to unify.pl to allow legacy encodings
+        - opt_encoding is passed to ngramprocessor.pm where necessary 
+          so that all encoding should now be handled in utf8 unless 
+          specified differently by the -e option to either list.pl or
+          unify.pl
 
 manual_0.3.pdf: 
-	- updated to reflect changes in 0.3.1 
+        - updated to reflect changes in 0.3.1 
 
 
 release notes v. 0.3
 ********************
-
 2013-11-28
+
 initial release
