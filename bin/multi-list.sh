@@ -2,7 +2,7 @@
 
 ##############################################################################
 # multi-nList.sh (c) A Buerki 2013
-version="0.9.2"
+version="0.9.3"
 copyright="Copyright 2013 Andreas Buerki"
 #
 # This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,10 @@ copyright="Copyright 2013 Andreas Buerki"
 # 
 # DATE			VERSION			CHANGE
 # 2013-12-26	0.9.2			adjusted progress reporting to use (( ))
+# 2013-12-27	0.9.3			adjusted handling of input files for list.pl
+#								and added -f option changing previous -f
+#								option by that name to -P (for prefix) and 
+#								changing option -e to be named -S (for suffix).
 ##############################################################################
 
 ### defining important variables
@@ -51,8 +55,9 @@ Example: $(basename $0) -e Bel 3 test_folder3 .
 Options: 
 -a  produces lists with the full set of numbers used to calculate statistics of association strength
 -d  produces ONE output list per ONE input document
--e ARG causes the output dir to have the ARG prepended to its name
--f ARG causes the output dir to have the ARG appended to its name
+-f N excludes n-grams with a frequency lower then N from lists
+-P ARG causes the output dir to have the ARG prepended to its name
+-S ARG causes the output dir to have the ARG appended to its name
 -H  replace hyphens (-) with 'HYPH' in output lists
 -h  displays this help message
 -l  produces n-grams across line breaks
@@ -99,7 +104,7 @@ output_filename=$(echo "$1$add$count")
 sep="·"
 
 # analyse options
-while getopts ac:de:f:hHiln:o:p:st:vVw: opt
+while getopts ac:df:P:S:hHiln:o:p:st:vVw: opt
 do
 	case $opt	in
 	a)	stats=".s"
@@ -110,9 +115,11 @@ do
 		;;
 	d)	perdoc="per_doc"
 		;;
-	e)	prefix="$OPTARG."
+	f)	f_option="-f $OPTARG"
 		;;
-	f)	affix=".$OPTARG"
+	P)	prefix="$OPTARG."
+		;;
+	S)	affix=".$OPTARG"
 		;;
 	h)	help
 		exit 0
@@ -259,10 +266,16 @@ elif [ "$count_version" == "list.pl" ]; then
 	freq_option="-a"
 fi
 
-# sort out nsize vs ngram option
+# sort out nsize vs ngram option and newline option
 if [ "$count_version" == "list.pl" ]; then
 	n_option="-n $nsize"
 else
+	echo "semantics of --newline options have been adjusted for $count_version" >&2
+	if [ -z "$newline" ]; then
+		newline="--newLine"
+	else
+		newline=
+	fi
 	n_option="--ngram $nsize"
 fi
 
@@ -289,7 +302,7 @@ if [ "$perdoc" == "per_doc" ] ; then
 	# now process files in indir
 	for file in $indir/*
 	do
-		$count_version $enc $n_option $window_option $token_option $stop_option $freq_option $newline $separator_option $outdir/$outfolder/$(basename $file).lst $file
+		$count_version $enc $n_option $window_option $token_option $stop_option $freq_option $f_option $newline $separator_option $outdir/$outfolder/$(basename $file).lst $file
 
 		if [ "$hyphen" == "true" ]; then
 			sed 's/-/HYPH/g' $outdir/$outfolder/$(basename $file).lst > $outdir/$outfolder/$(basename $file).lst.tmp
@@ -351,7 +364,11 @@ else
 		echo "progressing..."
 	fi
 	
-	$count_version $enc $n_option $window_option $token_option $stop_option $freq_option -newLine $separator_option $outdir/$outfolder/$nsize.lst $indir/*
+	if [ "$count_version" == "list.pl" ]; then
+		$count_version $enc $n_option $window_option $token_option $stop_option $freq_option $f_option $newline $separator_option $outdir/$outfolder/$nsize.lst $indir
+	else
+		$count_version $enc $n_option $window_option $token_option $stop_option $freq_option $f_option $newline $separator_option $outdir/$outfolder/$nsize.lst $indir/*
+	fi
 
 	if [ "$hyphen" == "true" ]; then
 		sed 's/-/HYPH/g' $outdir/$outfolder/$nsize.lst > $outdir/$outfolder/$nsize.lst.tmp

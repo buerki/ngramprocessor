@@ -1,3 +1,21 @@
+release notes v. 0.4.1
+**********************
+2013-12-27
+
+list.pl:
+- added -CA option to shebang line to encode arguments passed in UTF-8
+
+multi-list.sh
+- changed -e and -f option names to -S and -P respectively
+- adjusted calling of list.pl to avoid 'too many args' error
+- better support for calling legacy count.pl versions (-newline function)
+- added -f N option for specifying minimum frequency
+					
+manual_0.4.pdf:
+- updated for version 0.4.1
+
+
+
 release notes v. 0.4
 ********************
 2013-12-27
