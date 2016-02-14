@@ -3,56 +3,82 @@
 N-Gram Processor (NGP)
 ======================
 
-*see the included manual_0.4.pdf for detailed information, including a tutorial*
+*see the included manual_0.6.pdf for detailed information, including a tutorial*
 
-DESCRIPTION
+### DESCRIPTION
 ***********
 
-The N-Gram Processor is a set of scripts and a Perl module allowing the creation and processing of n-gram lists out of text files. list.pl creates n-gram lists from text files, unify.pl combines several separate lists created by list.pl. Two shell script wrappers are also included: multi-list.sh which makes it convenient to create large numbers of lists and split-unify.sh which employs a splitting method to combine large numbers of lists more efficiently. The feature set of the N-Gram Processor is simple enough:
+The N-Gram Processor is a set of scripts and a Perl module allowing the creation and processing of n-gram lists out of text files. It features the following:
 
-- creation of word n-gram lists out of input text, with n-gram frequencies
-- listing of document counts (in how many docs an n-gram occurs)
-- combination of large numbers of lists (of one n) into a single list
+- creation of word n-gram lists out of input text, incl. frequencies
+- listing of document counts (in how many documents an n-gram occurs)
 - unicode support
-- support for processing of reasonably large corpora (depending on hardware)
+- support for processing of reasonably large (10 million words or more) corpora, given appropriately powerful hardware
 - support for processing of annotated corpora
 
 Please refer to the PDF-manual for a more detailed description. 
 
-The NGP is based on code from two versions of the Ngram Statistics Package (NSP) by Ted Pedersen and collaborators (also known as Text::NSP). N-Gram Processor can be used for broadly the same purposes as the original NSP; the NGP differs from the NSP in the following areas:
+The codebase of the NGP is partly a branch of two versions of the Ngram Statistics Package (NSP) by Ted Pedersen and collaborators (also known as Text::NSP). The N-Gram Processor can be used for broadly the same purposes as the NSP – differences lie in the following areas:
 
 - support for unicode-encoded in- and output and multi-language awareness
 - generating document counts for n-grams
-- modifications to allow the processing of larger amounts of data  
+- modifications to allow the processing of larger amounts of data
+- no statistics module included (but compatible with the NSP's statistics module under certain conditions, see manual)
 
-The NGP does not include a statistics module (a key component of the original NSP), although NSP's statistics module can be used on output of the N-Gram Processor under certain conditions. Since NGP is otherwise completely separate from the NSP, both the NGP and the NSP can be installed on the same machine without causing conflicts.
+The two software packages are otherwise completely separate, so both can be installed on the same machine without causing conflicts.
 
-N-Gram Processor was tested under MacOS X and Xubuntu Linux, but should work well on any platform that can run Perl code and bash shell code.
+N-Gram Processor was tested under MacOS X, Xubuntu Linux and the Cygwin environment under Windows (cf. <http://cygwin.org>). It should also work well on any other platform that can run Perl code and bash shell code.
 
-INSTALLATION
+### INSTALLATION
 ************
 
-To install, type the following commands in a terminal window while in the ngramprocessor directory:
+#### Using the supplied installers (recommended):
+
+Double-clickable installers are provided for OS X, Xubuntu-Linux and the Cygwin environment under Windows. For other environments, please follow the manual installation instructions further down.
+
+###### OS X / Xubuntu
+
+Inside the `ngramprocessor_0.0` directory, double-click on `Xubuntu_installer` (for Xubuntu), `OSX_installer` (OS X). Follow the instructions of the installer. OS X might prompt users to install the command line tools – this is a free download from Apple and is needed to install the NGP.
+
+###### Windows
+
+The [Cygwin](cygwin.com) environment needs to be installed first. During the installation procedure for Cygwin, the following optional packages need to the installed:
+
+* 'bc' from the 'maths' category
+* 'make' from the 'devel' category
+* 'makemaker' from the 'perl' category
+* 'diffutils', 'ncurses' and  'cygutils-extra' from the 'utils' category 
+
+A guide on how to install Cygwin is found [here](http://x.cygwin.com/docs/ug/setup-cygwin-x-installing.html). After Cygwin has been installed, double click on the `Cygwin_installer` or `Cygwin64_installer` (try both if one does not work) to start the installation process.
+
+#### Manual installation / other flavours of Linux
+
+1. open a Terminal window
+ 
+      OS X: in Applications/Utilities
+      
+      Xbuntu Linux: via menu Applications>Accessories>Terminal
+      
+      Cygwin: via the link on the Windows desktop to Cygwin Terminal
+2. drop the `install.sh` script (located inside the `ngramprocessor_0.0 directory`) onto the terminal window and press ENTER. This should start the installation process.
+
+If an entirely manual installation is necessary, type the following commands into a terminal window while in the `ngramprocessor_0.0` directory:
 
 	perl Makefile.PL
 	make
 	make test
 	make install
 
-The last command requires administrative privileges, so it might need to be
-be run as `sudo make install`, for example on OS X. This installs the files
-in the standard locations. For more details, see the PDF-manual.
-
-The N-Gram Processor requires Perl version 5.12 or later and the shell scripts included require the bash shell.
+The last command requires administrative privileges, so it might need to be run as `sudo make install`, for example on OS X. This installs the files in the standard locations. The N-Gram Processor can then be launched from a terminal window by typing `NGP.sh` or by double-clicking on its icon (if the installers were used for installation). For more details, see the PDF-manual.
 
 
-AUTHOR
+###AUTHOR
 ******
 Andreas Buerki, <buerkiA@cardiff.ac.uk>  
 Authors of the N-gram Statistics Package (NSP), of which N-Gram Processor is a branch: (v1.09) Ted Pedersen, Satanjeev Banerjee, Amruta Purandare, Bridget Thomson-McInnes, Saiyam Kohli; (the v1.10 re-write) Bjoern Wilmsmann.
 
 
-SEE ALSO
+###SEE ALSO
 ********
 http://buerki.github.io/ngramprocessor/
 
@@ -63,10 +89,10 @@ http://www.d.umn.edu/~tpederse/nsp.html
 https://github.com/BjoernKW/Publications/blob/master/Re-write_of_Text-NSP.pdf
 
 
-COPYRIGHT
+###COPYRIGHT
 *********
+Copyright 2016, Cardiff University
 Copyright 2013, Andreas Buerki
-
 Copyright 2000-2006, Ted Pedersen, Satanjeev Banerjee,
 Amruta Purandare, Bridget Thomson-McInnes and Saiyam Kohli  
 Copyright 2006, Bjoern Wilmsmann

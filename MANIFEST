@@ -1,7 +1,9 @@
 bin/split-unify.sh
 bin/multi-list.sh
+bin/NGP.sh
 bin/list.pl
 bin/unify.pl
+bin/Leipzig_en_top200_1.2
 t/1.t
 test/files/text1.txt
 test/files/text2.txt
@@ -27,7 +29,5 @@ CHANGES
 gpl-3.0.txt
 INSTALL
 lib/Lingua/Ngramprocessor.pm
-manual_0.4.pdf
 Makefile.PL
 MANIFEST
-README.txt

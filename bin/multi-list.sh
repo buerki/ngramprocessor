@@ -1,9 +1,9 @@
 #!/bin/bash -
 
 ##############################################################################
-# multi-nList.sh (c) A Buerki 2013
-version="0.9.3"
-copyright="Copyright 2013 Andreas Buerki"
+# multi-list.sh
+version="0.9.4"
+copyright="Copyright 2013 Andreas Buerki, 2016 Cardiff University"
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,11 +20,6 @@ copyright="Copyright 2013 Andreas Buerki"
 ##############################################################################
 # DESCRRIPTION: wrapper for nlist (NGP) or count.pl (NSP) adding efficiency in
 #				for handling files in some circumstances.
-# SYNOPSIS: cou.sh [OPTIONS] OUTDIR INDIR N-SIZE
-# DEPENDENCIES: list.pl (NGP) or count.pl (NSP) or versions of those
-# UNDOCUMENTED OPTIONS (experimental):
-#	-C	create high freq per doc list
-#	-i  process files in iso8859-1 encoding rather than unicode
 #	
 #	
 #	
@@ -35,11 +30,12 @@ copyright="Copyright 2013 Andreas Buerki"
 # CHANGELOG
 # 
 # DATE			VERSION			CHANGE
-# 2013-12-26	0.9.2			adjusted progress reporting to use (( ))
+# 2016-01-03	0.9.4			adjusted copyright and added -s option
 # 2013-12-27	0.9.3			adjusted handling of input files for list.pl
 #								and added -f option changing previous -f
 #								option by that name to -P (for prefix) and 
 #								changing option -e to be named -S (for suffix).
+# 2013-12-26	0.9.2			adjusted progress reporting to use (( ))
 ##############################################################################
 
 ### defining important variables
@@ -55,9 +51,10 @@ Example: $(basename $0) -e Bel 3 test_folder3 .
 Options: 
 -a  produces lists with the full set of numbers used to calculate statistics of association strength
 -d  produces ONE output list per ONE input document
--f N excludes n-grams with a frequency lower then N from lists
+-f N excludes n-grams with a frequency lower than N from lists
 -P ARG causes the output dir to have the ARG prepended to its name
 -S ARG causes the output dir to have the ARG appended to its name
+-s  standard output directory names (suppress naming that reveals processing parameters)
 -H  replace hyphens (-) with 'HYPH' in output lists
 -h  displays this help message
 -l  produces n-grams across line breaks
@@ -70,34 +67,75 @@ Options:
 -w N  sets window size to N
 note: if neither an -n option nor [N-SIZE] is provided, bigrams will be produced.
 "
+# undocumented experimental options:
+#	-C	create high freq per doc list
+#	-i  process files in iso8859-1 encoding rather than unicode
 }
 
+#######################
 # define add_to_name function
-add_to_name ( ) {
-#####
+#######################
 # this function checks if a file name (given as argument) exists and
 # if so appends a number to the end so as to avoid overwriting existing
 # files of the name as in the argument or any with the name of the argument
-# plus an incremented count appended. The safe name is put in the variable
-# output_filename
+# plus an incremented count appended.
 ####
-
+add_to_name ( ) {
 count=
-if [ -a $1 ]; then
-	add=-
-	count=1
-	while [ -a $1-$count ]
-		do
-		(( count += 1 ))
+if [ "$(grep '.csv' <<< "$1")" ]; then
+	if [ -e "$1" ]; then
+		add=-
+		count=1
+		new="$(sed 's/\.csv//' <<< "$1")"
+		while [ -e "$new$add$count.csv" ];do
+			(( count += 1 ))
 		done
+	else
+		count=
+		add=
+	fi
+	output_filename="$(sed 's/\.csv//' <<< "$1")$add$count.csv"
+elif [ "$(grep '.lst' <<< "$1")" ]; then
+	if [ -e "$1" ]; then
+		add=-
+		count=1
+		new="$(sed 's/\.lst//' <<< "$1")"
+		while [ -e "$new$add$count.lst" ];do
+			(( count += 1 ))
+		done
+	else
+		count=
+		add=
+	fi
+	output_filename="$(sed 's/\.lst//' <<< "$1")$add$count.lst"
+elif [ "$(grep '.txt' <<< "$1")" ]; then
+	if [ -e "$1" ]; then
+		add=-
+		count=1
+		new="$(sed 's/\.txt//' <<< "$1")"
+		while [ -e "$new$add$count.txt" ];do
+			(( count += 1 ))
+		done
+	else
+		count=
+		add=
+	fi
+	output_filename="$(sed 's/\.txt//' <<< "$1")$add$count.txt"
 else
-	count=
-	add=
+	if [ -e "$1" ]; then
+		add=-
+		count=1
+		while [ -e "$1"-$count ]
+			do
+			(( count += 1 ))
+			done
+	else
+		count=
+		add=
+	fi
+	output_filename=$(echo "$1$add$count")
 fi
-output_filename=$(echo "$1$add$count")
-
 }
-
 ##############################end define functions#############################
 
 # set default value for $sep
@@ -120,6 +158,8 @@ do
 	P)	prefix="$OPTARG."
 		;;
 	S)	affix=".$OPTARG"
+		;;
+	s)	standard_naming="true"
 		;;
 	h)	help
 		exit 0
@@ -283,18 +323,17 @@ fi
 if [ -z "$perdoc" ]; then
 	perdoc="comp"
 fi
-mkdir $outdir/$prefix$nsize.$perdoc$stats$stop_name$token_name$win_name$affix|| exit 1
-
-outfolder=$prefix$nsize.$perdoc$stats$stop_name$token_name$win_name$affix
-export outfolder
-
-
-
+if [ "$standard_naming" ]; then
+	mkdir $outdir/$prefix$nsize-grams$affix|| exit 1
+	export outfolder=$prefix$nsize-grams$affix
+else
+	mkdir $outdir/$prefix$nsize.$perdoc$stats$stop_name$token_name$win_name$affix|| exit 1
+	export outfolder=$prefix$nsize.$perdoc$stats$stop_name$token_name$win_name$affix
+fi
 # check -d option
 if [ "$perdoc" == "per_doc" ] ; then
 ####################running per_doc mode###############################
-
-	total=$(ls $indir | wc -l)
+	total=$(ls "$indir" | wc -l)
 	if [ "$verbose" == "true" ]; then
 		echo -n "progress:   0% "
 	fi

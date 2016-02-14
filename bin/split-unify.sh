@@ -2,8 +2,8 @@
 
 ##############################################################################
 # split-unify.sh
-version="1.9"
-copyright="Copyright 2013 Andreas Buerki"
+version="2.0"
+copyright="Copyright 2013 Andreas Buerki, 2016 Cardiff University"
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ copyright="Copyright 2013 Andreas Buerki"
 ####
 # CHANGELOG
 # date			change
+# 01 Jan 2016	changed copyright assignment
 # 25 Dec 2013	added consolidation function to unify without calling unify.pl
 #				this function is called if -s (but not stats) is requested
 # 19 Nov 2013	reorganised options, added safeguard to alphabet split for the
@@ -785,7 +786,7 @@ fi
 
 
 # create name and path for temporary output file
-TMPFILE=$(mktemp -t combination) || TMPFILE=${TMPDIR-/tmp/}combination.$$
+TMPFILE=$(mktemp -t combinationXXX) || TMPFILE=${TMPDIR-/tmp/}combination.$$
 # this uses mktemp to create a path to a random filename with 'combination'
 # in it, using the path given in the TMPDIR variable and then puts the
 # path into the TMPFILE variable. If this fails, a path is put into the 
@@ -819,7 +820,7 @@ fi
 if [ "$unify_version" == "unify.pl" ] && [ -z "$statistics_requested" ]; then
 	:
 else
-	TMPfreqfile=$(mktemp -t freq) || TMPfreqfile="/tmp/$$.freq"
+	TMPfreqfile=$(mktemp -t freqXXX) || TMPfreqfile="/tmp/$$.freq"
 
 	# write appropriate freqency combinations to it
 	# if statistics are requested, we have to write out a lot
