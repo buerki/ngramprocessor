@@ -1,9 +1,10 @@
 #!/bin/bash -
 export PATH="$PATH:/usr/local/bin:/usr/bin:/bin:"$HOME/bin"" # needed for Cygwin
 ##############################################################################
-# NGP.sh (c) 2016 Cardiff University, 2013 Andreas Buerki, 2006 Bjoern Wilmsmann, 2000-2006 Ted Pedersen, Satanjeev Banerjee, Amruta Purandare, Bridget Thomson-McInnes and Saiyam Kohli
+# NGP.sh
+copyright="(c) 2016-17 Cardiff University, 2013 Andreas Buerki, 2006 Bjoern Wilmsmann, 2000-2006 Ted Pedersen, Satanjeev Banerjee, Amruta Purandare, Bridget Thomson-McInnes and Saiyam Kohli"
 ####
-version="0.6"
+version="0.6.5"
 # DESCRRIPTION: extracts n-grams from a corpus
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,7 +27,8 @@ export installation_dir="$(dirname $(which list.pl))"
 export extended="-r"
 export required_nsizes="2 3 4 5 6 7"
 export required_perdoc="-d"
-export required_stoplist="-o $installation_dir/Leipzig_en_top200_1.2" # this needs complemeting with the path to the stoplist
+export stoplist=Leipzig_en_top200_1.2 # this needs complemeting with the name of the stoplist
+export required_stoplist="-o $installation_dir/$stoplist" 
 #export required_cross_sentence=
 export required_minfreq="-f 2"
 export LC_ALL="en_GB.UTF-8"
@@ -48,24 +50,61 @@ OPTIONS:      -d    run in debugging mode
 NOTE:         all other functions are accessed interactively.
 "
 }
+###############
+# tidy function
+###############
+# The 'tidy' function tidies the output n-gram lists so that n-grams are 
+# separated from the frequencies by a tab and the document frequencies by a
+# further tab and the trailing space on each line is removed
+tidy ( ) {
+total=$#
+if [ "$verbose" == "true" ]; then
+	echo "$total list(s) to be processed"
+fi
+progress=0
+for lists in $@
+do
+	# first write sum of tokens to file
+	grep '^[0-9]*$' $lists > $lists.tidy
+	sed -e "s/$separator\([0-9]*\)  /$separator	\1	/g" -e "s/$separator\([0-9]*\) $/$separator	\1/g" -e 's/ $//g' < $lists | grep -v '^[0-9]*$' | eval $korean sort -k2,2nr -k1,1 >> $lists.tidy; mv $lists.tidy $lists
+	
+	# the above lines are explained as follows:
+	# sed line: replace patterns of '$separator' followed by a number 
+	# followed by a space
+	# replace that pattern with the first number found after the '$separator' 
+	# followed and preceeded by a tab. This takes care of lines
+	# like these 'ZAHL·—·ZAHL·132  38 ' producing this
+	# 'ZAHL·—·ZAHL·	132	38'
+	# 
+	# grep line: get rid of the total number of n-grams printed at the beginning
+	# of the list and sort the list
+	#
+	# sort: we sort without -d option as this option has thrown some errors in
+	# testing and sort after frequency in reverse order
+	((progress +=1))
+done
+if [ "$verbose" == "true" ]; then
+	echo "$progress list(s) tidied."
+fi
+}
 #######################
 # define add_windows_returns function
 #######################
 add_windows_returns ( ) {
-sed 's/$//' $1
+sed 's/$//' "$1"
 }
 #######################
 # define remove_windows_returns function
 #######################
 remove_windows_returns ( ) {
-sed 's///' $1
+sed 's///' "$1"
 }
 #######################
 # define splash function
 #######################
 splash ( ) {
 printf "\033c"
-echo "Licensed under the GNU General Public License"
+echo "NGP $copyright - Licensed under the GNU General Public License"
 echo
 echo
 echo
@@ -80,7 +119,7 @@ echo
 echo "          a. n-grams of length 2 to 7 orthographic words"
 echo "          b. global frequencies and frequencies per document"
 echo "          c. additive stoplist of top 200 English words"
-echo "          d. no n-grams across sentence boundaries"
+echo "          d. no n-grams across line breaks"
 echo "          e. alphanumeric characters and the following count as tokens:"
 echo "             -'&§%/+°ß"
 echo "          f. window size = n-gram size"
@@ -92,6 +131,11 @@ echo
 read -p '         > ' module  < /dev/tty
 case $module in
 Y|y)	make_SCRATCHDIRs
+	# reset standard extraction parameters as they might have been changed last time 'round
+	export required_nsizes="2 3 4 5 6 7"
+	export required_perdoc="-d"
+	export required_stoplist="-o $installation_dir/$stoplist" 
+	export required_minfreq="-f 2"
 	run_extraction_phase1
 	run_extraction_phase2
 	echo
@@ -216,12 +260,14 @@ make_SCRATCHDIRs ( ) {
 		mkdir ${TMPDIR-/tmp/}NGP1XXX.1$$
 		SCRATCHDIR1=${TMPDIR-/tmp/}NGP1XXX.1$$
 	fi
-	# for spare
-	export SCRATCHDIR2=$(mktemp -dt NGP2XXX) 
-	# if mktemp fails, use a different method to create the SCRATCHDIR
-	if [ "$SCRATCHDIR2" == "" ] ; then
-		mkdir ${TMPDIR-/tmp/}NGP2XXX.1$$
-		SCRATCHDIR2=${TMPDIR-/tmp/}NGP2XXX.1$$
+	# for debugging purposes
+	if [ "$debug" ]; then
+		export SCRATCHDIR2=$(mktemp -dt NGP2XXX) 
+		# if mktemp fails, use a different method to create the SCRATCHDIR
+		if [ "$SCRATCHDIR2" == "" ] ; then
+			mkdir ${TMPDIR-/tmp/}NGP2XXX.1$$
+			SCRATCHDIR2=${TMPDIR-/tmp/}NGP2XXX.1$$
+		fi
 	fi
 	# another one to keep other auxiliary and temporary files in
 	export SCRATCHDIR=$(mktemp -dt NGPXXX) 
@@ -230,7 +276,7 @@ make_SCRATCHDIRs ( ) {
 		mkdir ${TMPDIR-/tmp/}NGPXXX.1$$
 		SCRATCHDIR=${TMPDIR-/tmp/}NGPXXX.1$$
 	fi
-	if [ "$diagnostic" ]; then
+	if [ "$debug" ]; then
 		open $SCRATCHDIR $SCRATCHDIR1 $SCRATCHDIR2 $R_SCRATCHDIR
 	fi
 }
@@ -247,6 +293,10 @@ echo
 echo "          Drag the folder with input textfile(s) into this window and press ENTER."
 echo 
 read -p '           ' indir  < /dev/tty
+if [ "$(grep ' ' <<< "$indir")" ]; then
+	echo "The path to the folder includes a space. This will cause errors in processing. Please put the textfiles into a path without spaces (for example by replacing spaces in folder names with underscores) and try again."
+exit 0
+fi
 # get rid of any single quotation marks that might have attached
 export indir="$(sed "s/'//g" <<<"$indir")"
 # check if anything was entered
@@ -274,7 +324,13 @@ else
 fi
 # check if anything is inside the directory
 if [ "$(ls "$indir" | wc -l | sed 's/ //g')" -gt 0 ]; then
-	:
+	# check if there is only a single file in the directory
+	if [ "$(ls "$indir" | wc -l | sed 's/ //g')" -eq 1 ]; then
+		single_file=TRUE
+		if [ "$debug" ]; then
+			echo "single file detected in $indir; switching to single-file mode."
+		fi
+	fi
 else
 	echo "$indir is empty."
 	echo "A folder with textfiles must be provided. Please drop the folder into this window."
@@ -286,10 +342,15 @@ else
 		return
 	fi
 fi
+# remove any Windows returns from in-files
+for file in $(ls "$indir"); do
+	remove_windows_returns "$indir"/$file > "$indir/$file."
+	mv "$indir"/$file. "$indir"/$file
+done
 # change dir to that of the in-dir
 #export working_dirname="$(dirname "$indir" | sed "s/'//g")"
 #cd "$working_dirname" 2>/dev/null || dirfail=true
-#if [ "$diagnostic" ]; then 
+#if [ "$debug" ]; then 
 #	echo "now in $(pwd). dirname is $working_dirname"
 #	read -p 'press ENTER to continue ' xxx < /dev/tt
 #fi
@@ -297,7 +358,7 @@ fi
 #if [ "$CYGWIN" ]; then
 #	# if it wasn't possible to cd earlier, warn if in -d mode
 #	if [ "$dirfail" ]; then
-#		if [ "$diagnostic" ]; then
+#		if [ "$debug" ]; then
 #			echo "cd failed, still in $(pwd)"
 #			read -p 'press ENTER to continue ' xxx < /dev/tt
 #		fi
@@ -316,9 +377,11 @@ if [ "$CYGWIN" ]; then
 		if [ "$window" ]; then
 			required_window=$(echo "-w $(( $required_size + $window ))")
 		fi
-		"$installation_dir/multi-list.sh" -p '<>' -s $linebreaks $required_perdoc $required_stoplist $required_minfreq -H $required_tokendef $required_window -n $required_size "$SCRATCHDIR1" "$indir"
-		if [ "$diagnostic" ]; then
-			echo "$installation_dir/multi-list.sh -p '<>' -s $linebreaks $required_perdoc $required_stoplist $required_minfreq -H $required_tokendef $required_window -n $required_size $SCRATCHDIR1 $indir"
+		if [ "$debug" ]; then
+			"$installation_dir/multi-list.sh" -p '<>' -v -s $linebreaks $required_perdoc $required_stoplist $required_minfreq -H $required_tokendef $required_window -n $required_size "$SCRATCHDIR1" "$indir"
+			echo "$installation_dir/multi-list.sh -p '<>' -v -s $linebreaks $required_perdoc $required_stoplist $required_minfreq -H $required_tokendef $required_window -n $required_size $SCRATCHDIR1 $indir"
+		else
+			"$installation_dir/multi-list.sh" -p '<>' -s $linebreaks $required_perdoc $required_stoplist $required_minfreq -H $required_tokendef $required_window -n $required_size "$SCRATCHDIR1" "$indir"
 		fi
 	done
 else
@@ -328,13 +391,18 @@ else
 		if [ "$window" ]; then
 			required_window=$(echo "-w $(( $required_size + $window ))")
 		fi
-		if [ "$diagnostic" ]; then
+		if [ "$debug" ]; then
 			echo "$installation_dir/multi-list.sh $special_sep -s $linebreaks $required_perdoc $required_stoplist $required_minfreq -H $required_tokendef $required_window -n $required_size $SCRATCHDIR1 $indir"
+			"$installation_dir/multi-list.sh" -v $special_sep -s $linebreaks $required_perdoc $required_stoplist $required_minfreq -H $required_tokendef $required_window -n $required_size "$SCRATCHDIR1" "$indir"
+		else
+			"$installation_dir/multi-list.sh" $special_sep -s $linebreaks $required_perdoc $required_stoplist $required_minfreq -H $required_tokendef $required_window -n $required_size "$SCRATCHDIR1" "$indir"
 		fi
-		"$installation_dir/multi-list.sh" $special_sep -s $linebreaks $required_perdoc $required_stoplist $required_minfreq -H $required_tokendef $required_window -n $required_size "$SCRATCHDIR1" "$indir"
 	done
 fi
 echo
+if [ "$debug" ]; then
+	cp -r $SCRATCHDIR1 $SCRATCHDIR2/after_phase1
+fi
 }
 #######################
 # define run_extraction_phase2 function
@@ -344,8 +412,13 @@ run_extraction_phase2 ( ) {
 	echo "Combining split lists..."
 	echo
 	for required_size in $required_nsizes; do
-		echo "now combining $required_size-grams..."
-		"$installation_dir/split-unify.sh" -ins $required_perdoc "$SCRATCHDIR1/$required_size-grams"
+		if [ "$single_file" ] || [ -z "$required_perdoc" ]; then
+			tidy "$SCRATCHDIR1/$required_size-grams/"*.lst
+			mv "$SCRATCHDIR1/$required_size-grams/"*.lst "$SCRATCHDIR1/$required_size.lst"
+		else
+			echo "now combining $required_size-grams..."
+			"$installation_dir/split-unify.sh" -ins $required_perdoc "$SCRATCHDIR1/$required_size-grams"
+		fi
 	done
 	# remove any directories left uncombined
 	for dir in $(ls $SCRATCHDIR1 | grep -v '.lst'); do
@@ -353,11 +426,11 @@ run_extraction_phase2 ( ) {
 	done
 	# determine outdir
 	outdir="$(dirname "$indir")"
-	cd $outdir
+	cd "$outdir"
 	add_to_name N-gram_lists
 	cd - > /dev/null
 	#mkdir $output_filename
-	if [ "$diagnostic" ]; then
+	if [ "$debug" ]; then
 		echo "scratchdir is $SCRATCHDIR1"
 		echo "output dir is $outdir/$output_filename"
 	fi
@@ -368,7 +441,11 @@ run_extraction_phase2 ( ) {
 			add_windows_returns $file > $file.
 			mv $file. $file
 		fi
-		mv $file "$outdir/$output_filename/$(basename $(sed 's/.lst/.txt/g' <<< "$file"))"
+		if [ "$debug" ]; then
+			cp $file "$outdir/$output_filename/$(basename $(sed 's/.lst/.txt/g' <<< "$file"))"
+		else
+			mv $file "$outdir/$output_filename/$(basename $(sed 's/.lst/.txt/g' <<< "$file"))"
+		fi
 	done
 	#mv $SCRATCHDIR1/* "$output_filename"
 	echo
@@ -387,11 +464,10 @@ run_extraction_phase2 ( ) {
 		fi
 	fi
 	# tidy up
-	if [ "$diagnostic" == true ]; then
+	if [ "$debug" == true ]; then
 		:
 	else
 		rm -r $SCRATCHDIR1 &
-		rm -r $SCRATCHDIR2 &
 		rm -r $SCRATCHDIR &
 	fi
 }
@@ -478,7 +554,7 @@ fi
 while getopts dhpV opt
 do
 	case $opt	in
-	d)	diagnostic=true
+	d)	export debug=true
 		echo "Running in debug mode";sleep 1
 		;;
 	h)	help
@@ -487,13 +563,16 @@ do
 	p)	special_sep="-p $OPTARG"
 		;;
 	V)	echo "$(basename "$0")	-	version $version"
-		echo "(c) 2016 Cardiff University, 2013 Andreas Buerki,  2006 Bjoern Wilmsmann, 2000-2006 Ted Pedersen, Satanjeev Banerjee, Amruta Purandare, Bridget Thomson-McInnes and Saiyam Kohli"
+		echo "$copyright"
 		echo "Licensed under the GNU General Public License"
 		exit 0
 		;;
 	esac
 done
 shift $((OPTIND -1))
+# splash screen
+#printf "\033c"
+#echo "N-Gram Processor - (c) 2016 Cardiff University - licensed under the GNU General Public License"
 printf "\033c"
 splash
 sleep 5

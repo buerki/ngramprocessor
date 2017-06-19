@@ -2,8 +2,8 @@
 
 ##############################################################################
 # multi-list.sh
-version="0.9.4"
-copyright="Copyright 2013 Andreas Buerki, 2016 Cardiff University"
+version="0.9.5"
+copyright="Copyright 2013 Andreas Buerki, 2016-17 Cardiff University"
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

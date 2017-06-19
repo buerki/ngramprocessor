@@ -1,9 +1,8 @@
 #!/bin/bash -
-
 ##############################################################################
 # split-unify.sh
-version="2.0"
-copyright="Copyright 2013 Andreas Buerki, 2016 Cardiff University"
+version="2.1"
+copyright="Copyright 2013 Andreas Buerki, 2016-17 Cardiff University"
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,12 +87,9 @@ copyright="Copyright 2013 Andreas Buerki, 2016 Cardiff University"
 # 18 Jul 2010	added -b option for an 84-way split for very large data sets
 # 15 Jul 2010	now runs on alphabet-split47.sh rather than 42
 ##############################################################################
-
 I=$(date +"%e-%b-%H:%M:%S") # putting start date and time in variable I
 ID=$(echo $I | sed 's/ //g') # cutting any leading space from string and put $ID
-
 #################################define functions#############################
-
 #################
 ### help function (displays help)
 #################
@@ -120,7 +116,6 @@ NOTE: IN-DIRECTORY would ordinarily be the output directory of 'multi-list.sh'
       is achieved, compensated by the longest processing time.
 "
 }
-
 #####
 # define add_to_name function
 add_to_name ( ) {
@@ -131,7 +126,6 @@ add_to_name ( ) {
 # plus an incremented count appended. The safe name is put in the variable
 # output_filename
 ####
-
 count=
 if [ -a "$1" ]; then
 	add=-
@@ -145,14 +139,11 @@ else
 	add=
 fi
 output_filename=$(echo "$1$add$count")
-
 }
-
-
 ###############
 # tidy function
 ###############
-# The 'tidy' function tidies the output of huge-count.pl so that n-grams are 
+# The 'tidy' function tidies the output n-gram lists so that n-grams are 
 # separated from the frequencies by a tab and the document frequencies by a
 # further tab and the trailing space on each line is removed
 tidy ( ) {
@@ -166,7 +157,6 @@ do
 	# first write sum of tokens to file
 	grep '^[0-9]*$' $lists > $lists.tidy
 	sed -e "s/$separator\([0-9]*\)  /$separator	\1	/g" -e "s/$separator\([0-9]*\) $/$separator	\1/g" -e 's/ $//g' < $lists | grep -v '^[0-9]*$' | eval $korean sort -k2,2nr -k1,1 >> $lists.tidy
-	
 	# the above lines are explained as follows:
 	# sed line: replace patterns of '$separator' followed by a number 
 	# followed by a space
@@ -180,16 +170,12 @@ do
 	#
 	# sort: we sort without -d option as this option has thrown some errors in
 	# testing and sort after frequency in reverse order
-	
 	((progress +=1))
-	
 done
 if [ "$verbose" == "true" ]; then
 	echo "$progress list(s) tidied."
 fi
 }
-
-
 ###########################
 # alphabet-split function
 ###########################
@@ -205,7 +191,6 @@ alphabet-split ( ) {
 # !!! first argument must be output file name !!!
 # !!! subsequent arguments must be n-gram lists to be combined !!!
 ###
-
 # analyse options
 while getopts vb opt
 do
@@ -216,18 +201,14 @@ do
 		;;
 	esac
 done
-
 shift $((OPTIND -1))
-
 # check if at least 3 arguments were supplied
 if [ $# -lt 3 ] ; then
 	echo 'ERROR: output filename and 2 lists to combine must minimally be supplied as arguments to the function alphabet-split' >&2
 	exit 1
 fi
-
 out="$1"
 shift  # shift so that subsequent arguments start with the lists supplied
-
 # create scratch directories where temp files can be moved about
 SCRATCHDIR1=$(mktemp -dt combinationXXX) 
 # if mktemp fails, use a different method to create the SCRATCHDIR1
@@ -243,24 +224,20 @@ if [ "$SCRATCHDIR2" == "" ] ; then
 	mkdir ${TMPDIR-/tmp/}combination.2$ID2
 	SCRATCHDIR2=${TMPDIR-/tmp/}combination.2$ID2
 fi
-
 # create a variable with the required letter sequences for the splits
 if [ -n "$big" ]; then
 	letters="$(echo -n {A..Z}; echo -n " "; echo -n {A..B}{A..Z}; echo -n " "; echo -n C{A..F})"
 else
 	letters="$(echo -n {A..Z}; echo -n " "; echo A{A..T})"
 fi
-
 # create alphabet directories in SCRATCHDIR1
 for label in $letters ; do
 	mkdir $SCRATCHDIR1/$label
 done
 mkdir $SCRATCHDIR1/remainder
-
 if [ -n "$big" ]; then
 	# put the split regexes into the variable split_into
 	split_into="^A[a-q] ^A[r-z] ^B[a-e] ^B[f-z] ^[CD] ^[E] ^[G] ^F ^[HIJ] ^K ^L ^M ^N[A-E] ^N[F-Z|a-z] ^[O-P] ^[Q-R] ^S[a-o] ^S[p-z] ^[T] ^[UV] ^[W] ^[X-Z] ^a[a-l] ^a[m-t] ^au[a-n] ^au[o-z] ^b[a-e] ^b[f-z] ^(c|er[a-z]|ü) ^d[a-d] ^de[a-q] ^der$separator[a-z] ^der$separator[A-Z] (^der[a-z]|^de[s-z]) ^die$separator[a-z] ^die$separator[A-Z] ^die[a-z] ^(di[f-z]|d[j-z]|e[a-h]) ^ein[a-z] ^einA$separator[A-Z] ^einA$separator[a-z] ^(e[j-q]|er$separator) ^e[s-z] ^f ^h[a-g] ^ge ^(h[h-z]|g[f-z]|g[a-d]) ^i[a-e] ^i[f-m] ^in ^i[o-z] ^j ^k ^l ^m[a-h] ^mit ^m(i[a-s]|i[u-z]|k-z) ^n[a-g] ^n[h-z] ^[opqr] ^s[a-d] ^s[e-h] ^si[a-c] ^si[d-z] ^s[j-z] ^(t|u[a-m]) ^und$separator[A-Z|a-d] ^u(nd$separator[e-z]) ^u(n[o-z]|[o-z]) ^v[a-n] ^v[o-z] ^w[a-d] ^we ^w[f-l] ^(w[m-z]|xy) ^zu ^z([a-t]|[v-z]) ^dA$separator[A-D] ^dA$separator[E-L] ^dA$separator[M-S] ^dA$separator[T-Z] ^dA$separator[a-j] ^dA$separator[k-z] ^(dA$separator(ü|Ü|-|&|ä|Ä|ö|Ö)|m(ä|ö|ü)|d(ä|ö|ü)|ö|ä|Ä|Ö|Ü|h(ä|ö|ü)|w(ä|ö|ü))"
-
 	# combine the above 84 into a single regex with | and put it in its 
 	# own variable
 	remainder_regex=$( echo $split_into | sed 's/ /|/g' )
@@ -268,23 +245,19 @@ else
 	# put the split regexes into the variable split_into
 	# though there are incidentally only 46, the 47th is the remainder
 	split_into="^[A] ^[B] ^[CDE] ^[G] ^[FHIJ] ^[KL] ^[MN] ^[O-R] ^[S] ^[T] ^[UV] ^[W] ^[X-Z] ^a[a-o] ^a[p-z] ^[bc] ^d[a-d] ^de[a-q] ^der$separator[a-z] ^der$separator[A-Z] (^der[a-z]|^de[s-z]) ^die$separator[a-z] ^die$separator[A-Z] ^die[a-z] ^(di[f-z]|d[j-z]|e[a-g]) ^e[h-i] ^e[j-z] ^[fh] ^[g] ^i[a-m] ^i[n-z] ^[jk] ^[lm] ^[n] ^[opqr] ^s[a-d] ^s[e-k] ^s[l-z] ^(t|u[a-m]) ^u[n-z] ^[v] ^[wxy] ^[z] ^dA$separator[A-L] ^dA$separator[M-Z] ^dA$separator[a-z]"
-
 	# combine the above 46 into a single regex with | and put it in its 
 	# own variable
 	remainder_regex=$( echo $split_into | sed 's/ /|/g' )
 fi
-
 # create the array labels (from scalar 'letters') which will be used to
 # name the split lists and put them into the correct directory
 labels=( $letters )
-
 # inform user and create feedback variables
 if [ "$verbose" == "true" ]; then
 	echo -n "splitting lists.  0%"
 	total=$(echo "$@" | wc -w | sed 's/ //g')
 	progress=0
 fi
-
 # divide lists into sub-lists (plain 'for' operates on $@)
 for arg
 do
@@ -307,20 +280,13 @@ do
 	# removed this from above: | grep -v ^[0-9]*$
 done
 # the second grep makes sure no total n-gram counts end up in the remainder
-
-
 # inform user
 if [ "$verbose" == "true" ]; then
 	echo -e "\b\b\b Done splitting."
 fi
-
-
-
 # combine sub-lists
-
 # add 'remainder' to the letter variable
 letters="$letters remainder"
-
 # initiate variable for user report and start reporting
 if [ "$verbose" == "true" ] && [ -n "$big" ]; then
 	# set user feedback variable
@@ -332,7 +298,6 @@ elif [ "$verbose" == "true" ]; then
 	progress=0
 	echo -n "processing combination: $progress of 47"
 fi
-
 for letter in $letters; do
 	# purge any files of size 0
 	for file in $(ls $SCRATCHDIR1/$letter/*); do
@@ -369,13 +334,9 @@ for letter in $letters; do
 		fi
 	fi
 done
-
 if [ "$verbose" == "true" ]; then
 	echo " "
 fi
-
-
-
 # put final list together
 if [ "$verbose" == "true" ]; then
 	echo "assembling final list ..."
@@ -384,12 +345,9 @@ cat $SCRATCHDIR2/* | grep -v ^0$ > "$out"  # | grep -v ^[0-9]*$
 # Lines consisting only of 0s need purging (they are put there by
 # unify.pl at the beginning of each combined list) because if they occur
 # within a list they cause errors.
-
 # tidying up in the background (& runs these processes in the background)
 rm -r $SCRATCHDIR1 $SCRATCHDIR2 > /dev/null &
 }
-
-
 ######################
 # consolidate function
 ######################
@@ -405,10 +363,7 @@ consolidate ( ) {
 # !!! first argument must be output file name !!!
 # !!! subsequent arguments must be n-gram lists to be combined !!!
 ###
-
 # analyse options
-
-
 local OPTIND
 while getopts nqrs:v opt
 do
@@ -425,37 +380,27 @@ do
 		;;
 	esac
 done
-
 shift $((OPTIND -1))
-
 # set document count handling
 if [ "$doc_count" == "-d" ]; then
 	:
 else
 	no_document_count=true
 fi
-
-
-
 # putting name of input file in variable $list
 list=$1
-
 ### for debugging purposes
 #echo "list is $list"
 #echo "TMPFILE is $TMPFILE"
 ###
-	
 # sort and move list into memory (i.e. into a variable)
 #copied_list="$SCRATCHDIR/$(basename $list).sorted"
 new_list="$SCRATCHDIR/$(basename $list).new"
 if [ "$verbose" == "true" ]; then
 	echo "sorting ... (this can take a while)"
 fi
-
 # now tidy and sort list
 copied_list=$(sed -e "s/$separator\([0-9]*\)  /$separator	\1	/g" -e "s/$separator\([0-9]*\) $/$separator	\1/g" -e 's/ $//g' -e 's/	/•/g' $list | grep -v '^[0-9]*$' | eval $korean sort)
-
-
 # check if source list has document count 
 # (i.e. check for a third column with an integer greater than 0)
 if [ "$(head -2 $copied_list | tail -1 | cut -f 3)" -ge 0 ]; then
@@ -466,8 +411,6 @@ else
 		echo "lists without document count detected"
 	fi
 fi 2> /dev/null
-
-	
 # cut off document count if -n option is active and list has a doc-count
 # this is an unlikely scenario, but just in case
 if [ "$no_document_count" == "true" ] && [ -z "$nodoc" ]; then
@@ -476,21 +419,15 @@ if [ "$no_document_count" == "true" ] && [ -z "$nodoc" ]; then
 	fi
 	copied_list=$(echo "$copied_list" | cut -d '•' -f 1-2)
 fi
-	
-	
 if [ "$verbose" == "true" ]; then
 	# define variable with total lines in list
 	total=$(echo "$copied_list" | wc -l | sed 's/ *\([0-9]*\).*/\1/g')
 	echo -n "consolidating n-grams. Progress:   0% "
-fi
-	
-	
-	
+fi	
 # initiate some variables
 total_freq=0
 previous_ngram=""
-progress=0
-	
+progress=0	
 # work out how document counts should be treated
 if [ -z "$no_document_count" ]; then # doc count is required
 	if [ -z "$nodoc" ]; then # doc count is present in input
@@ -506,10 +443,8 @@ fi
 	
 # go through list line by line
 for line in $(echo "$copied_list"); do
-
 	# keep track of line count to decide when to write buffer
 	((lines +=1))
-	
 	# produce progress information to show to user
 	if [ "$verbose" == "true" ]; then
 		((progress +=1))
@@ -524,14 +459,11 @@ for line in $(echo "$copied_list"); do
 			report=0
 		fi
 	fi
-	
 	# set variables for current line
 	IFS='•' read -a in <<< "$line"
 	#current n-wc -gram is then ${in[0]}
 	#freq of current n-gram is then ${in[1]}
-	#and any current document frequency is then ${in[2]}
-		
-		
+	#and any current document frequency is then ${in[2]}	
 	if [ "${in[0]}" == "$previous_ngram" ]; then
 		(( total_freq += ${in[1]} ))
 		case $mode in
@@ -573,7 +505,6 @@ for line in $(echo "$copied_list"); do
 		# shift {in[1]} to total_freq
 		total_freq="${in[1]}"
 	fi
-	
 	# write buffer every 50,000 lines
 	if [ $lines -gt 50000 ]; then
 		# write buffer to file
@@ -583,11 +514,7 @@ for line in $(echo "$copied_list"); do
 		# reset lines count
 		lines=0
 	fi
-	
-	
-	
 done
-
 # write last line
 case $mode in
 	max)	# work out the highest doc count in acc_doc_freqs
@@ -611,27 +538,16 @@ case $mode in
 	none)	# write to new list
 		buffer+=$"$previous_ngram	$total_freq "
 esac
-
 # write remaining buffer to file
 echo "$buffer" | tr ' ' '\n' >> $TMPFILE$suffix
-
 # make sure 100% completion is reported
 if [ "$verbose" == true ]; then
 	echo -en "\b\b\b\b 100%"
 fi
-
 }
-
-
-
-
-
 ##############################end define functions#############################
-
-
 # set default value for variable small to false
 small=false
-
 # analyse options
 while getopts hbdsvij:kumnV opt
 do
@@ -670,21 +586,17 @@ echo "This program is distributed in the hope that it will be useful, but WITHOU
 		;;
 	esac
 done
-
 shift $((OPTIND -1))
-
 # check if 1 argument was supplied
 if [ $# != 1 ] ; then
 	echo "Error: please supply source directory as argument, script terminated without changing any files" >&2
 	exit 1
 fi
-
 # check if both -m and -b options are active
 if [ "$cons_used" == "true" ] && [ "$big" == "true" ]; then
 	echo "-b option overrides -m option. -m option will be turned off" >&2
 	cons_used=
 fi
-
 # check if source directory exists
 if [ -d "$1" ] ; then
 	:
@@ -692,18 +604,31 @@ else
 	echo "$1 does not appear to be a valid directory" >&2
 	exit 1
 fi
-
-
 # obtain full path to source directory (if not already specified)
 # and put it in source_dir variable
 cd "$1"
 source_dir="$(pwd)"
 cd - > /dev/null
-
-
 # set separator and
 # set nsize variable by checking first input list (unless unify.pl used)
 line=$(head -2 "$source_dir/"$(ls "$source_dir" | head -1) | tail -1 )|| exit 1
+# if the first list only contains a digit, search other lists for separator
+if [ "$(grep '^[[:digit:]]*$' <<<$line)" ]; then
+	echo "looking for separator..."
+	for list in $(ls $source_dir); do
+		if [ "$(wc -l < "$source_dir/"$list)" -gt 1 ]; then
+			line="$(tail -1 "$source_dir/"$list)"
+			found_sep=TRUE
+		else
+			# remove list
+			rm "$source_dir/$list"
+		fi
+	done
+	if [ -z "$found_sep" ]; then
+		echo "Lists in $source_dir contain no sequences above cutoff."
+		exit 0
+	fi
+fi
 nsize=$(echo $line | awk '{c+=gsub(s,s)}END{print c}' s='<>') 
 if [ "$nsize" -gt 0 ]; then
 	separator='<>'
@@ -721,37 +646,29 @@ else
 		fi
 	fi
 fi
-
 if [ "$verbose" == "true" ]; then
 	echo "separator is $separator"
 fi
-
-
 # inform user
 if [ "$verbose" == "true" ]; then
 	echo "processing $nsize - gram lists ..."
 fi
-
 # check if source dir contains at least 2 files ending in .list
 # if not, check if no files ending in .list are in the source dir
 # if that isn't the case either, check if there is 1 file and set the variable
-#  'single_list' to true
+#  'single_file' to true
 no_of_files=$(ls "$source_dir" | egrep "(\.lst|\.list)" | wc -l)
 if [ "$no_of_files" -lt 1 ]; then
 	echo "no lists to be combined found in $source_dir. Lists must end in .lst or .list" >&2
 	exit 1
 elif [ "$no_of_files" -eq 1 ]; then
-	single_list=true
+	single_file=true
 fi
-
 # check if there are other files present in the source dir
 if [ "$no_of_files" -ne "$(ls "$source_dir" | wc -l)" ] ; then
 	echo "ERROR non-conforming files were detected in the $source_dir. Only files ending in .list or .lst can be processed with this script." >&2
 	exit 1
 fi
-
-
-
 # if the -n option is active, set statistics_requested to false,
 # otherwise check if -n option could be on
 if [ "$absolutely_no_statistics" == "true" ]; then
@@ -761,7 +678,6 @@ else
 	# many spaces there are on line two of the first input file
 	# if there's only 1 space, there are no statistics numbers
 	spaces=$(head -2 "$source_dir/"$(ls "$source_dir" | head -1) | tail -1 | awk '{c+=gsub(s,s)}END{print c}' s=' ')
-
 	case $spaces in
 		1)	:
 		;;
@@ -772,7 +688,6 @@ else
 		;;
 	esac
 fi
-
 # check if file contains mostly Korean and if so, flip -k option ON
 # if not on already
 if [ -z "$korean" ]; then
@@ -783,8 +698,6 @@ if [ -z "$korean" ]; then
 		fi
 	fi
 fi
-
-
 # create name and path for temporary output file
 TMPFILE=$(mktemp -t combinationXXX) || TMPFILE=${TMPDIR-/tmp/}combination.$$
 # this uses mktemp to create a path to a random filename with 'combination'
@@ -795,7 +708,6 @@ TMPFILE=$(mktemp -t combinationXXX) || TMPFILE=${TMPDIR-/tmp/}combination.$$
 # delete the actual file, so we don't get the error that the OUTFILE
 # exists
 rm $TMPFILE
-
 # statistics can only be calculated reliably if -s option is active.
 # so if it is not active, give warning and switch to no statistics
 if [ "$statistics_requested" == "true" ] && [ "$small" == "false" ]; then
@@ -804,7 +716,6 @@ if [ "$statistics_requested" == "true" ] && [ "$small" == "false" ]; then
 	echo "calculation of those numbers." >&2
 	statistics_requested=
 fi
-
 # if statistics are requested for 5-grams and above, inform user
 # that that won't be done.
 if [ "$statistics_requested" == "true" ] && [ $nsize -gt 4 ]; then
@@ -812,8 +723,6 @@ if [ "$statistics_requested" == "true" ] && [ $nsize -gt 4 ]; then
 	echo 'processing without statistics numbers...' >&2
 	statistics_requested=
 fi
-
-
 # produce temporary frequency-combination file for use with --set_freq_combo
 # option of unify.pl
 # make temp file
@@ -821,7 +730,6 @@ if [ "$unify_version" == "unify.pl" ] && [ -z "$statistics_requested" ]; then
 	:
 else
 	TMPfreqfile=$(mktemp -t freqXXX) || TMPfreqfile="/tmp/$$.freq"
-
 	# write appropriate freqency combinations to it
 	# if statistics are requested, we have to write out a lot
 	if [ "$statistics_requested" == "true" ]; then
@@ -871,26 +779,25 @@ else
 		eval echo {0..$TMPfreq} > $TMPfreqfile
 	fi
 fi
-
-# check if 'single_list' was turned on
-if [ "$single_list" == "true" ] ; then
-	mv "$source_dir/"*.list $TMPFILE
+# check if 'single_file' was turned on
+if [ "$single_file" == "true" ] ; then
+	#mv "$source_dir/"*.list $TMPFILE
+	if [ "$debug" ]; then
+		cp "$source_dir/$required_size"*.lst "$TMPFILE"
+	else
+		mv "$source_dir/$required_size"*.lst "$TMPFILE"
+	fi
 else
-
-
 	# check for -s option
 	if [ "$small" == "true" ] ; then
 	#########################################run small version##################
-	
 		# inform user
 		if [ "$verbose" == "true" ]; then
 			echo "performing combination on $(ls "$source_dir" | egrep "(\.lst|\.list)" | wc -l) files."
 		fi
-	
 		# run unify.pl or alternative legacy NSP script if statistics requested
 		# or if a unify_version is especially requested,
 		# otherwise use consolidate function
-		
 		# if both statistics are requested and unify.pl, run unify.pl w/stats
 		if [ "$unify_version" == "unify.pl" ] && [ "$statistics_requested" == "true" ]; then
 			unify.pl $doc_count -s $TMPfreqfile $TMPFILE "$source_dir"
@@ -912,7 +819,6 @@ else
 			$unify_version $doc_count --set_freq_combo $TMPfreqfile --ngram $nsize -destination $TMPFILE -count "$source_dir/"*.l*st 
 		else
 			# else run consolidate function
-			
 			# create scratch directory
 			SCRATCHDIR=$(mktemp -dt combinationXXX) 
 			# if mktemp fails, use a different method to create the SCRATCHDIR
@@ -920,19 +826,15 @@ else
 				mkdir ${TMPDIR-/tmp/}combination.1$$
 				SCRATCHDIR=${TMPDIR-/tmp/}combination.1$$
 			fi
-			
 			# put all input lists into a single file
 			for file in $(ls "$source_dir"); do 
 				cat "$source_dir/"$file >> $SCRATCHDIR/catfile
 			done
-			
 			# now consolidate
 			consolidate -n $SCRATCHDIR/catfile
 		fi
-	
 	elif [ -n "$cons_used" ]; then
 	######################run generic consolidate version####################
-
 		# create scratch directory
 		SCRATCHDIR=$(mktemp -dt combinationXXX) 
 		# if mktemp fails, use a different method to create the SCRATCHDIR
@@ -940,41 +842,32 @@ else
 			mkdir ${TMPDIR-/tmp/}combination.1$$
 			SCRATCHDIR=${TMPDIR-/tmp/}combination.1$$
 		fi
-			
 		# put all input lists into a single file
 		for file in $(ls "$source_dir"); do 
 			grep '^[A-Ma-g]' "$source_dir/"$file >> $SCRATCHDIR/catfile1
 			grep -v '^[A-Ma-g]' "$source_dir/"$file >> $SCRATCHDIR/catfile2
 		done
-		
 		# now consolidate
 		consolidate -nqs A $SCRATCHDIR/catfile1 > /dev/null &
 		consolidate -ns B $SCRATCHDIR/catfile2
-		
 		# wait for A to finish
 		if [ "$verbose" == "true" ]; then
 			echo ""
 			echo "waiting for parallel process to complete..."
 		fi
 		wait
-		
 		# merge
 		cat $TMPFILE.A $TMPFILE.B > $TMPFILE
-	
 	else
 	##############################run mid or big version####################
-	
 		# inform user
 		if [ "$verbose" == "true" ]; then
 			echo "performing combination on $no_of_files files in $source_dir ..."
 		fi
-		
 		# if no unify-version is set, set to unify.pl
 		if [ -z "$unify_version" ]; then
 			unify_version="unify.pl"
 		fi
-		
-
 		if [ "$verbose" == "true" ]; then
 			if [ "$big" == "true" ]; then
 				alphabet-split -vb $TMPFILE $(ls "$source_dir" | \
@@ -994,20 +887,15 @@ else
 		fi
 	######################################################################
 	fi
-
 fi
-
 ### check name of source_dir and put it in the variable dir_name
 dir_name=$(basename "$source_dir")
 # if it was '.' , then replace it with pwd
 if [ "$dir_name" == "." ] ; then 
 	dir_name=$(basename $(pwd))
 fi
-
-
 # get path to dir above source_dir
 source_dir_plus=$(echo "$source_dir" | sed "s/\/$dir_name//")
-
 # check if individual lists should be retained (if not, delete),
 # and rename the source_dir
 if [ "$discard_indiv_lists" == "true" ] ; then
@@ -1015,28 +903,20 @@ if [ "$discard_indiv_lists" == "true" ] ; then
 else
 	mv "$source_dir" "$source_dir_plus/indiv_lists_$dir_name"
 fi
-
-
 # check if planned name for output list is taken and adjust accordingly
 add_to_name "$source_dir_plus/"$(echo "$dir_name" | cut -d '.' -f 1,2).lst
-
-
 # delete frequency combination file, if it exists
 if [ -n "$TMPfreqfile" ] && [ -e $TMPfreqfile ] ; then
 	rm $TMPfreqfile
 fi
-
-
 # if consolidation function was used (rather than a form of unify.pl)
 if [ -n "$cons_used" ]; then
 		# sort final list
 		if [ "$verbose" == "true" ]; then
 			echo " "
 			echo "sorting output list ..."
-		fi
-	
+		fi	
 		eval $korean sort -k2,2nr -k1,1 $TMPFILE | sed '/^$/d' > "$output_filename"
-		
 		# tidy up in the background
 		rm -r $TMPFILE > /dev/null &
 		rm -r $SCRATCHDIR > /dev/null &
@@ -1054,14 +934,8 @@ else
 		rm -r $TMPFILE > /dev/null &
 	fi
 fi
-
-
-
-
-
 if [ "$verbose" == "true" ]; then
 	echo "output directory written to $output_filename"
 	echo "start:		$ID"
 	echo "completion:	$(date +"%e-%b-%H:%M:%S")"
 fi
-
