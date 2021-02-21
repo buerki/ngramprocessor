@@ -38,7 +38,7 @@ Double-clickable installers are provided for OS X, Xubuntu-Linux and the Cygwin 
 
 ###### OS X / Xubuntu
 
-Inside the `ngramprocessor_0.0` directory, double-click on `Xubuntu_installer` (for Xubuntu), `OSX_installer` (OS X). Follow the instructions of the installer. OS X might prompt users to install the command line tools – this is a free download from Apple and is needed to install the NGP.
+Inside the `ngramprocessor_0.0` directory, double-click on `Xubuntu_installer` (for Xubuntu), `OSX_installer` (OS X). Follow the instructions of the installer. OS X might prompt users to install the command line tools – this is a free download from Apple and is needed to install the NGP. A video walk through the installation process for MacOS 10.15 is found [here](https://vimeo.com/448806908)
 
 ###### Windows
 
@@ -92,10 +92,13 @@ https://github.com/BjoernKW/Publications/blob/master/Re-write_of_Text-NSP.pdf
 ###COPYRIGHT
 *********
 Copyright 2016, Cardiff University
+
 Copyright 2013, Andreas Buerki
+
+Copyright 2006, Bjoern Wilmsmann
+
 Copyright 2000-2006, Ted Pedersen, Satanjeev Banerjee,
 Amruta Purandare, Bridget Thomson-McInnes and Saiyam Kohli  
-Copyright 2006, Bjoern Wilmsmann
 
 The NGP is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

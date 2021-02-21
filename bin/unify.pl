@@ -3,9 +3,10 @@
 #####################################################################
 # unify.pl (part of the N-Gram Processor)
 # incorporating code from NSP 1.10's huge-combine.pl/Combiner.pm
-our $VERSION = '0.05';
+our $VERSION = '0.6.6';
 #####
-our $copyright = "Copyright 2013, Andreas Buerki
+our $copyright = "Copyright 2021, Cardiff University
+Copyright 2013, Andreas Buerki
 Copyright 2006, Bjoern Wilmsmann (v. 1.10 NSP)
 Copyright 2004, Amruta Parundare & Ted Pedersen (v. 1.09 NSP)\n";
 #
@@ -32,6 +33,7 @@ Copyright 2004, Amruta Parundare & Ted Pedersen (v. 1.09 NSP)\n";
 #
 # CHANGELOG
 # date		 v.		change
+# 2021-02-21 0.6.6	changed shebang line to #!/usr/bin/env perl
 # 2013-12-21 0.05	added explicit encoding to all filehandles and -e option
 #					replaced use encoding; with use Encode;
 # 2013-11-14 0.04	fixed and corrected pod documentation

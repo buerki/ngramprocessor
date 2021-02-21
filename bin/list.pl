@@ -1,10 +1,11 @@
-#!/usr/bin/perl -wCA
+#!/usr/bin/env perl -wCA
 
 ##############################################################################
 # list.pl
 # based on NSP's count.pl
-our $VERSION = '0.06';
+our $VERSION = '0.6.6';
 ####
+# Copyright 2021, Cardiff University
 # Copyright 2013, Andreas Buerki
 # Copyright 2000-2003, Ted Pedersen and Amruta Purandare
 #
@@ -24,6 +25,7 @@ our $VERSION = '0.06';
 # CHANGELOG
 # 
 # DATE			VERSION			CHANGE
+# 2021-02-21	0.6.6			changed shebang line to #!/usr/bin/env perl -wCA
 # 2013-12-21	0.06			changed use encoding; to use Encode;
 # 2013-11-13	0.05			made calculation of plain n-gram frequencies the
 #								default behaviour, -a to calculate all freq comb

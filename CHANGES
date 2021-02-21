@@ -1,3 +1,20 @@
+release notes v. 0.6.6
+**********************
+2020-02-21
+
+list.pl and unify.pl
+- changed shebang line to #!/usr/bin/env perl
+
+release notes v. 0.6.5
+**********************
+2017-06-19
+
+NGP.sh, multi-list.sh and split-unify.sh
+- fixed errors that occured when the input directory contained only a single document
+  or when an attempt was made to combine empty n-gram lists. 
+- improved -d option to show more intermediate stage results for debugging purposes
+
+
 release notes v. 0.6
 ********************
 2016-02-13
