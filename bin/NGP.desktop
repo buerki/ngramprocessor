@@ -1,13 +1,11 @@
-#!/usr/bin/env xdg-open
-
 [Desktop Entry]
-Version=1.0
+Version=0.4
 Encoding=UTF-8
 Type=Application
-Name=linux_installer
+Name=NGP
 Comment=
 Categories=Application;
-Exec=./OSX_installer.command
-Icon=./icon.png
+Exec=/usr/local/bin/NGP.sh
+Icon=NGP
 Terminal=true
 StartupNotify=false

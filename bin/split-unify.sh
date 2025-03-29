@@ -1,8 +1,8 @@
 #!/bin/bash -
 ##############################################################################
 # split-unify.sh
-version="2.1"
-copyright="Copyright 2013 Andreas Buerki, 2016-17 Cardiff University"
+version="2.2"
+copyright="Copyright 2013 Andreas Buerki, 2016-17, 2025 Cardiff University"
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ copyright="Copyright 2013 Andreas Buerki, 2016-17 Cardiff University"
 ####
 # CHANGELOG
 # date			change
+# 2025-03-28	replaced egrep with grep -E
 # 01 Jan 2016	changed copyright assignment
 # 25 Dec 2013	added consolidation function to unify without calling unify.pl
 #				this function is called if -s (but not stats) is requested
@@ -271,7 +272,7 @@ do
 	fi
 	iteration=0
 	for regex in $split_into; do
-		egrep "$regex" "$source_dir/$arg" > \
+		grep -E "$regex" "$source_dir/$arg" > \
 		$SCRATCHDIR1/${labels[$iteration]}/$arg.${labels[$iteration]}
 		(( iteration += 1 ))
 	done
@@ -657,7 +658,7 @@ fi
 # if not, check if no files ending in .list are in the source dir
 # if that isn't the case either, check if there is 1 file and set the variable
 #  'single_file' to true
-no_of_files=$(ls "$source_dir" | egrep "(\.lst|\.list)" | wc -l)
+no_of_files=$(ls "$source_dir" | grep -E "(\.lst|\.list)" | wc -l)
 if [ "$no_of_files" -lt 1 ]; then
 	echo "no lists to be combined found in $source_dir. Lists must end in .lst or .list" >&2
 	exit 1
@@ -793,7 +794,7 @@ else
 	#########################################run small version##################
 		# inform user
 		if [ "$verbose" == "true" ]; then
-			echo "performing combination on $(ls "$source_dir" | egrep "(\.lst|\.list)" | wc -l) files."
+			echo "performing combination on $(ls "$source_dir" | grep -E "(\.lst|\.list)" | wc -l) files."
 		fi
 		# run unify.pl or alternative legacy NSP script if statistics requested
 		# or if a unify_version is especially requested,
@@ -871,18 +872,18 @@ else
 		if [ "$verbose" == "true" ]; then
 			if [ "$big" == "true" ]; then
 				alphabet-split -vb $TMPFILE $(ls "$source_dir" | \
-				egrep "(\.lst|\.list)" )
+				grep -E "(\.lst|\.list)" )
 			else
 				alphabet-split -v $TMPFILE $(ls "$source_dir" | \
-				egrep "(\.lst|\.list)" )
+				grep -E "(\.lst|\.list)" )
 			fi
 		else
 			if [ "$big" == "true" ]; then
 				alphabet-split -b $TMPFILE $(ls "$source_dir" | \
-				egrep "(\.lst|\.list)" )
+				grep -E "(\.lst|\.list)" )
 			else
 				alphabet-split $TMPFILE $(ls "$source_dir" | \
-				egrep "(\.lst|\.list)" )
+				grep -E "(\.lst|\.list)" )
 			fi
 		fi
 	######################################################################

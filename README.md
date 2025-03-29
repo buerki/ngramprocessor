@@ -1,4 +1,6 @@
-![NGP](NGP.png)
+![](https://zenodo.org/badge/DOI/10.5281/zenodo.814279.svg)
+
+![](NGP.png)
 
 N-Gram Processor (NGP)
 ======================
@@ -72,13 +74,13 @@ If an entirely manual installation is necessary, type the following commands int
 The last command requires administrative privileges, so it might need to be run as `sudo make install`, for example on OS X. This installs the files in the standard locations. The N-Gram Processor can then be launched from a terminal window by typing `NGP.sh` or by double-clicking on its icon (if the installers were used for installation). For more details, see the PDF-manual.
 
 
-###AUTHOR
+### AUTHOR
 ******
 Andreas Buerki, <buerkiA@cardiff.ac.uk>  
 Authors of the N-gram Statistics Package (NSP), of which N-Gram Processor is a branch: (v1.09) Ted Pedersen, Satanjeev Banerjee, Amruta Purandare, Bridget Thomson-McInnes, Saiyam Kohli; (the v1.10 re-write) Bjoern Wilmsmann.
 
 
-###SEE ALSO
+### SEE ALSO
 ********
 http://buerki.github.io/ngramprocessor/
 
@@ -89,7 +91,7 @@ http://www.d.umn.edu/~tpederse/nsp.html
 https://github.com/BjoernKW/Publications/blob/master/Re-write_of_Text-NSP.pdf
 
 
-###COPYRIGHT
+### COPYRIGHT
 *********
 Copyright 2016, Cardiff University
 

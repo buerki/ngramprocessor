@@ -1,9 +1,9 @@
-#!/usr/bin/env perl -wCA
+#!/usr/bin/env -S perl -wCA
 
 ##############################################################################
 # list.pl
 # based on NSP's count.pl
-our $VERSION = '0.6.6';
+our $VERSION = '0.6.7';
 ####
 # Copyright 2021, Cardiff University
 # Copyright 2013, Andreas Buerki

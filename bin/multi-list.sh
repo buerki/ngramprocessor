@@ -2,7 +2,7 @@
 
 ##############################################################################
 # multi-list.sh
-version="0.9.5"
+version="0.9.6"
 copyright="Copyright 2013 Andreas Buerki, 2016-17 Cardiff University"
 #
 # This program is free software: you can redistribute it and/or modify
@@ -30,6 +30,7 @@ copyright="Copyright 2013 Andreas Buerki, 2016-17 Cardiff University"
 # CHANGELOG
 # 
 # DATE			VERSION			CHANGE
+# 2025-03-28    0.9.6           replaced egrep with grep -E
 # 2016-01-03	0.9.4			adjusted copyright and added -s option
 # 2013-12-27	0.9.3			adjusted handling of input files for list.pl
 #								and added -f option changing previous -f
@@ -382,7 +383,7 @@ if [ "$perdoc" == "per_doc" ] ; then
 
 		cd $outfolder/
 
-		egrep "$sep(1[789]) $|$sep(2[0123456789]) $|$sep([3456789][0123456789]) $" * > ../high-per-doc-freq_lists/$output_filename
+		grep -E "$sep(1[789]) $|$sep(2[0123456789]) $|$sep([3456789][0123456789]) $" * > ../high-per-doc-freq_lists/$output_filename
 
 		# delete the log if empty
 		if [ -s ../high-per-doc-freq_lists/$output_filename ] ; then
